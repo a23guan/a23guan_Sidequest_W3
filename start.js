@@ -12,13 +12,13 @@
 // currentScreen === "start"
 function drawStart() {
   // Background colour for the start screen
-  background(180, 225, 220); // soft teal background
+  background("#8ed1e0"); // soft teal background
 
   // ---- Title text ----
   fill(30, 50, 60);
   textSize(46);
   textAlign(CENTER, CENTER);
-  text("Win or Lose", width / 2, 180);
+  text("Welcome to the Orchard!", width / 2, 250);
 
   // ---- Buttons (data only) ----
   // These objects store the position/size/label for each button.
@@ -26,28 +26,26 @@ function drawStart() {
   // and also reuse the same information for hover checks.
   const startBtn = {
     x: width / 2,
-    y: 320,
+    y: 730,
     w: 240,
     h: 80,
     label: "START",
   };
 
-  const instrBtn = {
+  const startApple = {
     x: width / 2,
-    y: 430,
-    w: 240,
-    h: 80,
-    label: "INSTRUCTIONS",
+    y: 530,
+    size: 3,
   };
 
   // Draw both buttons
   drawButton(startBtn);
-  drawButton(instrBtn);
+  drawApple(startApple.x, startApple.y, startApple.size);
 
   // ---- Cursor feedback ----
   // If the mouse is over either button, show a hand cursor
   // so the player knows it is clickable.
-  const over = isHover(startBtn) || isHover(instrBtn);
+  const over = isHover(startBtn);
   cursor(over ? HAND : ARROW);
 }
 
@@ -57,16 +55,11 @@ function drawStart() {
 // Called from main.js only when currentScreen === "start"
 function startMousePressed() {
   // For input checks, we only need x,y,w,h (label is optional)
-  const startBtn = { x: width / 2, y: 320, w: 240, h: 80 };
-  const instrBtn = { x: width / 2, y: 430, w: 240, h: 80 };
+  const startBtn = { x: width / 2, y: 730, w: 240, h: 80 };
 
   // If START is clicked, go to the game screen
   if (isHover(startBtn)) {
     currentScreen = "game";
-  }
-  // If INSTRUCTIONS is clicked, go to the instructions screen
-  else if (isHover(instrBtn)) {
-    currentScreen = "instr";
   }
 }
 
@@ -79,10 +72,6 @@ function startMousePressed() {
 function startKeyPressed() {
   if (keyCode === ENTER) {
     currentScreen = "game";
-  }
-
-  if (key === "i" || key === "I") {
-    currentScreen = "instr";
   }
 }
 
@@ -134,4 +123,31 @@ function drawButton({ x, y, w, h, label }) {
   textSize(28);
   textAlign(CENTER, CENTER);
   text(label, x, y);
+}
+
+function drawApple(x, y, size) {
+  push();
+  translate(x, y);
+  scale(size);
+
+  // Apple body
+  noStroke();
+  fill(220, 0, 0);
+  ellipse(0, 0, 40, 40);
+
+  // Apple highlight
+  fill(255, 80);
+  ellipse(-8, -8, 10, 10);
+
+  // Stem
+  stroke(90, 50, 20);
+  strokeWeight(3);
+  line(0, -20, 0, -30);
+
+  // Leaf
+  noStroke();
+  fill(40, 160, 60);
+  ellipse(10, -28, 15, 8);
+
+  pop();
 }

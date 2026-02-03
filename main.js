@@ -28,7 +28,7 @@ let currentScreen = "start"; // "start" | "instr" | "game" | "win" | "lose"
 // ------------------------------
 // This is where you usually set canvas size and initial settings.
 function setup() {
-  createCanvas(800, 800);
+  createCanvas(windowWidth, windowHeight);
 
   // Sets a default font for all text() calls
   // (This can be changed later per-screen if you want.)
@@ -49,7 +49,6 @@ function draw() {
   //   lose.js          → drawLose()
 
   if (currentScreen === "start") drawStart();
-  else if (currentScreen === "instr") drawInstr();
   else if (currentScreen === "game") drawGame();
   else if (currentScreen === "win") drawWin();
   else if (currentScreen === "lose") drawLose();
