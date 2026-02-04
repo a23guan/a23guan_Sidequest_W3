@@ -12,117 +12,122 @@
 // and interact with the button on the game screen.
 // Keeping this in one object makes it easier to move,
 // resize, or restyle the button later.
-const gameBtn = {
-  x: 400, // x position (centre of the button)
-  y: 550, // y position (centre of the button)
-  w: 260, // width
-  h: 90, // height
-  label: "PRESS HERE", // text shown on the button
-};
+
+let counter = 0;
+let apples = [];
+let gameInitialized = false;
 
 // ------------------------------
-// Main draw function for this screen
+// SETUP
 // ------------------------------
-// drawGame() is called from main.js *only*
-// when currentScreen === "game"
+
 function drawGame() {
-  // Set background colour for the game screen
-  background(240, 230, 140);
+  if (!gameInitialized) {
+    apples = [];
+    counter = 0;
 
-  // ---- Title and instructions text ----
-  fill(0); // black text
-  textSize(32);
-  textAlign(CENTER, CENTER);
-  text("Game Screen", width / 2, 160);
+    for (let i = 0; i < 3; i++) {
+      apples.push(new Apple());
+    }
 
+    gameInitialized = true;
+  }
+
+  background("#8ed1e0");
+  // UI text
+  fill(0);
   textSize(18);
-  text(
-    "Click the button (or press ENTER) for a random result.",
-    width / 2,
-    210,
-  );
+  textAlign(CENTER, CENTER);
+  text("Click on the apples to harvest them", width / 2, 20);
+  text("Score: " + counter, 70, 20);
 
-  // ---- Draw the button ----
-  // We pass the button object to a helper function
-  drawGameButton(gameBtn);
+  // Update + draw apples
+  for (let a of apples) {
+    a.update();
+    a.display();
+  }
 
-  // ---- Cursor feedback ----
-  // If the mouse is over the button, show a hand cursor
-  // Otherwise, show the normal arrow cursor
-  cursor(isHover(gameBtn) ? HAND : ARROW);
+  // Ground
+  push();
+  rectMode(CORNER);
+  fill("#4c8d1e");
+  rect(0, height - 60, width, 60);
+  pop();
 }
 
 // ------------------------------
-// Button drawing helper
+// APPLE CLASS
 // ------------------------------
-// This function is responsible *only* for drawing the button.
-// It does NOT handle clicks or game logic.
-function drawGameButton({ x, y, w, h, label }) {
-  rectMode(CENTER);
+class Apple {
+  constructor() {
+    this.reset();
+  }
 
-  // Check if the mouse is hovering over the button
-  // isHover() is defined in main.js so it can be shared
-  const hover = isHover({ x, y, w, h });
+  reset() {
+    this.x = random(40, width - 40);
+    this.y = random(-200, -40);
+    this.speed = 2.5;
+    this.size = 2;
+  }
+
+  update() {
+    this.y += this.speed;
+
+    // Respawn if it hits the ground
+    if (this.y > height - 60 - 20) {
+      this.reset();
+    }
+  }
+
+  display() {
+    drawApple(this.x, this.y, this.size);
+  }
+
+  isClicked(mx, my) {
+    let d = dist(mx, my, this.x, this.y);
+    return d < 20 * this.size;
+  }
+}
+
+// ------------------------------
+// INPUT
+// ------------------------------
+function handleGameClick() {
+  for (let a of apples) {
+    if (a.isClicked(mouseX, mouseY)) {
+      counter++;
+      if (counter >= 10) {
+        currentScreen = "win";
+        gameInitialized = false;
+      }
+      a.reset();
+      break;
+    }
+  }
+}
+
+// ------------------------------
+// DRAW APPLE
+// ------------------------------
+function drawApple(x, y, size) {
+  push();
+  translate(x, y);
+  scale(size);
 
   noStroke();
+  fill(220, 0, 0);
+  ellipse(0, 0, 40, 40);
 
-  // Change button colour when hovered
-  // This gives visual feedback to the player
-  fill(
-    hover
-      ? color(180, 220, 255, 220) // lighter blue on hover
-      : color(200, 220, 255, 190), // normal state
-  );
+  fill(255, 80);
+  ellipse(-8, -8, 10, 10);
 
-  // Draw the button rectangle
-  rect(x, y, w, h, 14); // last value = rounded corners
+  stroke(90, 50, 20);
+  strokeWeight(3);
+  line(0, -20, 0, -30);
 
-  // Draw the button text
-  fill(0);
-  textSize(28);
-  textAlign(CENTER, CENTER);
-  text(label, x, y);
-}
+  noStroke();
+  fill(40, 160, 60);
+  ellipse(10, -28, 15, 8);
 
-// ------------------------------
-// Mouse input for this screen
-// ------------------------------
-// This function is called from main.js
-// only when currentScreen === "game"
-function gameMousePressed() {
-  // Only trigger the outcome if the button is clicked
-  if (isHover(gameBtn)) {
-    triggerRandomOutcome();
-  }
-}
-
-// ------------------------------
-// Keyboard input for this screen
-// ------------------------------
-// Allows keyboard-only interaction (accessibility + design)
-function gameKeyPressed() {
-  // ENTER key triggers the same behaviour as clicking the button
-  if (keyCode === ENTER) {
-    triggerRandomOutcome();
-  }
-}
-
-// ------------------------------
-// Game logic: win or lose
-// ------------------------------
-// This function decides what happens next in the game.
-// It does NOT draw anything.
-function triggerRandomOutcome() {
-  // random() returns a value between 0 and 1
-  // Here we use a 50/50 chance:
-  // - less than 0.5 → win
-  // - 0.5 or greater → lose
-  //
-  // You can bias this later, for example:
-  // random() < 0.7 → 70% chance to win
-  if (random() < 0.5) {
-    currentScreen = "win";
-  } else {
-    currentScreen = "lose";
-  }
+  pop();
 }
