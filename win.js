@@ -21,8 +21,8 @@ function drawWin() {
   textAlign(CENTER, CENTER);
 
   // Main success message
-  textSize(40);
-  text("You Win! 🎉", width / 2, 300);
+  textSize(70);
+  text("🍎 You Win! 🎉 🍎", width / 2, height / 2);
 }
 
 // ------------------------------------------------------------
